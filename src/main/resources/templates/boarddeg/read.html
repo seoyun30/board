@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+<body>
+<h1>게시글 상세보기</h1>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="row">
+
+                <div class="col-2">
+                    <div class="mb-3">
+                        제목
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3" th:text="${boardDTO.title}">
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-2">
+                    <div class="mb-3">
+                        내용
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3" th:text="${boardDTO.content}">
+
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+
+                <div class="col-2">
+                    <div class="mb-3">
+                        작성자
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="mb-3" th:text="${boardDTO.writer}">
+
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-dark update">수정</button>
+            <button type="button"  class="btn btn-dark list">목록</button>
+            <button type="button"  class="btn btn-dark sam">목록</button>
+
+            <h1>댓글 등록</h1>
+
+            댓글 내용 <input class="replyText"> <br>
+            작성자 <input class="replyWriter"> <br>
+
+
+            <button class="btnR">댓글 등록</button>
+            <button class="btnM">댓글 수정</button>
+
+
+            <div class="replylist">
+
+
+            </div>
+
+
+            <script th:inline="javascript">
+
+                let a = [[${pageRequestDTO}]]
+                let bno = [[${boardDTO.bno}]]
+                let btnM = $(".btnM")
+                btnM.hide()
+
+                $(".list").on("click", function () {
+                    location.href="/board/list?" + a.link
+                })
+
+                $(".update").on("click", function () {
+                    location.href="/board/update?bno=" + bno +'&' +a.link
+                })
+
+                $(".sam").on("click", function () {
+                    $.get("/board/b", function (data) {
+                        alert(data)
+                    });
+                })
+
+                let replyText = $(".replyText")
+                let replyWriter = $(".replyWriter")
+                //댓글 리스트를 함수로 만드는 이유는
+                //처음 들어올 때 한번. 댓글 등록할 때도 한번.
+                //댓글을 수정할 때도 한번. 다시 불러와야 해서
+                function showList() {
+                    let str = "";
+
+                    $.ajax({
+                        url : "/reply/list",
+                        type : "get",
+                        data : { bno : bno , page : 1 } ,
+                        success : function (data) {
+                            console.log("홍길동")
+                            console.log(data)
+
+                            let dtoList = data.dtoList
+                            let pagenum = data.page
+
+                            for (let i = 0; i < dtoList.length; i++){
+
+                                str += `<ul>
+                                                <li>
+                                                    <span data-rno="${dtoList[i].rno}">${dtoList[i].replyText}</span>
+
+                                                        <b>
+                                                            ${dtoList[i].writer}
+                                                        </b>
+
+                                                </li>
+                                            </ul>`
+
+                                $(".replylist").html(str)
+                            }
+
+
+
+                        },
+                        error : function (error) {
+                            console.log(error)
+                            console.log(error.responseText)
+                        }
+                    })
+                }
+                //목록 호출
+                showList();
+
+                //수정. 목록을 클릭했을 때
+
+                let clrno = ""
+                $(".replylist").on("click", "span", function () {
+                    let rno = $(this).data("rno")
+                    console.log(rno)
+                    $.ajax({
+                        url : "/reply/read/" + rno,
+                        type : "get",
+                        success : function (data) {
+
+                            clrno = data.rno
+
+                            replyText.val(data.replyText)
+                            replyWriter.val(data.writer)
+                            btnM.show()
+
+                        },
+                        error : function () {
+
+                        }
+                    })
+
+                })
+
+                btnM.on("click", function () {
+
+                    let replyDTO = {
+                        rno : clrno ,
+                        replyText : replyText.val(),
+                        writer : replyWriter.val()
+                    }
+
+                    $.ajax({
+                        url : "/reply/update/" + rno,
+                        data : replyDTO,
+                        type : "post",
+                        success : function (data) {
+                            replyText.val("")
+                            replyWriter.val("")
+                            btnM.hide()
+                        },
+                        error : function () {
+
+                        }
+                    })
+
+                })
+
+
+
+
+                //댓글 등록
+                $(".btnR").on("click",function () {
+
+                    if(bno == null || bno == ""){
+                        return false;
+                    }
+                    if (replyText.val() == "" || replyText.val().length < 2){
+                        alert("댓글 내용은 2자 이상이어야 합니다.")
+                        return false;
+                    }
+                    if (replyWriter.val() == "" || replyWriter.val().length < 2){
+                        alert("작성자는 2자 이상이어야 합니다.")
+                        return false;
+                    }
+
+                    let val = {
+                        bno : bno ,
+                        replyText : replyText.val(),
+                        writer : replyWriter.val()
+                    }
+
+                    $.ajax({
+                        url : "/reply/register",
+                        type : "post",
+                        data : val,
+                        success : function (data) {
+                            replyText.val("")
+                            replyWriter.val("")
+
+                            alert(data)
+                            showList();
+                        },
+                        error : function (error) {
+                            alert(error.responseText);
+                        }
+                    })
+
+                })
+
+
+
+
+
+            </script>
+
+        </div>
+    </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+</body>
+</html>

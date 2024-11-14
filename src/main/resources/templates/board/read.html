@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+
+
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">Navbar</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/board/list">게시판</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/board/list">공지사항</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Dropdown
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#">Action</a></li>
+                        <li><a class="dropdown-item" href="#">Another action</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                </li>
+            </ul>
+            <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>상세보기</h1>
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col shadow p-3 mb-5 bg-body-tertiary rounded">
+            <form action="" method="" th:object="${boardDTO}">
+                <div class="mb-3 row">
+                    <label for="bno" class="col-sm-2 col-form-label">글번호</label>
+                    <div class="col-sm-10">
+                        <input type="text" readonly class="form-control-plaintext" id="bno" th:value="*{bno}">
+
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label for="title" class="col-sm-2 col-form-label">글내용</label>
+                    <div class="col-sm-10">
+                        <input type="text" readonly class="form-control-plaintext" id="title" th:value="${boardDTO.bno}">
+                    </div>
+
+                </div>
+                <div class="row mb-3">
+                    <th:block th:unless="${#lists.isEmpty(boardImgDTOList)}" th:each="imgdto:${boardImgDTOList}">
+                        <div class="col">
+                            <img th:src="${'/images/' + imgdto.newImgName}">
+                        </div>
+                    </th:block>
+                </div>
+                <div class="row mb-3">
+                    <th:block th:if="${#lists.isEmpty(boardImgDTOList)}">
+                        <div class="col">
+                            이미지가 없습니다.
+                        </div>
+                    </th:block>
+                </div>
+
+                <div class="row text-end">
+                    <div class="col">
+                        <button type="button" class="btn btn-success modifiy">수정</button>
+
+                        <button type="button" class="btn btn-danger">삭제</button>
+                    </div>
+
+                </div>
+
+
+
+            </form>
+        </div>
+
+
+    </div>
+
+    <div class="row">
+        <div class="col shadow p-3 mb-5 bg-body-tertiary rounded ">
+            <div class="row mb-2">
+                <div class="col text-end ">
+                    <button type="button" class="btn btn-primary registerbtn" data-bs-toggle="modal" data-bs-target="#exampleModal" data-bs-whatever="@mdo">댓글등록</button>
+                </div>
+            </div>
+
+            <!--모달-->
+            <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5  replytitle" id="exampleModalLabel">댓글 등록</h1>  <!--댓글등록 댓글수정-->
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form>
+
+
+
+                                <div class="mb-3">
+                                    <label for="message-text" class="col-form-label">댓글내용:</label>
+                                    <textarea class="form-control replytext" id="message-text"></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="recipient-name" class="col-form-label">작성자:</label>
+                                    <input type="text" class="form-control replywriter" id="recipient-name">
+                                </div>
+
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary savebtn cbtn">저장</button>
+                            <button type="button" class="btn btn-primary modifybtn cbtn">수정</button>
+                            <button type="button" class="btn btn-primary delbtn cbtn">삭제</button>
+                            <button type="button" class="btn btn-secondary closebtn cbtn" data-bs-dismiss="modal">Close</button>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--모달끝-->
+
+            <!--댓글 목록창-->
+
+            <ul class="list-group replylist">
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">Subheading</div>
+                        Content for list item
+                    </div>
+                    <span class="badge text-bg-primary rounded-pill">14</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">Subheading</div>
+                        Content for list item
+                    </div>
+                    <span class="badge text-bg-primary rounded-pill">14</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="ms-2 me-auto">
+                        <div class="fw-bold">Subheading</div>
+                        Content for list item
+                    </div>
+                    <span class="badge text-bg-primary rounded-pill">14</span>
+                </li>
+            </ul>
+
+            <!--댓글 목록창 끝-->
+
+            <!--댓글 페이징-->
+
+            <nav aria-label="Page navigation example"  class="mt-4">
+                <ul class="pagination justify-content-end">
+                    <li class="page-item disabled">
+                        <a class="page-link">Previous</a>
+                    </li>pagination
+
+                    <li class="page-item"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+
+                    <li class="page-item">
+                        <a class="page-link" href="#">Next</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <button class="addd">더보기</button>
+
+            <!--댓글 페이징 끝-->
+
+
+        </div>
+    </div>
+
+
+</div>
+
+<script th:inline="javascript">
+    let bno = [[${boardDTO.bno}]]   //현재 본문번호
+    // let bno = 1;
+    let registerbtn = $(".registerbtn")//댓글등록
+    let replytitle = $(".replytitle") //댓글상단제목
+    let replytext = $(".replytext") //댓글내용
+    let replywriter = $(".replywriter")//댓글작성자
+    let savebtn = $(".savebtn")//저장버튼
+    let modifybtn = $(".modifybtn")//수정버튼
+    let delbtn = $(".delbtn")//삭제버튼
+    let page = 1; //초기페이지번호
+    let replylist = $(".replylist")  // 댓글 목록
+    let cbtn = $(".cbtn")
+    let closebtn = $(".closebtn")
+    let rno="";
+    let modifiy=$(".modifiy")
+
+    let pagination = $(".pagination") //페이징 처리를 위한 ul 테그
+
+    //넘겨줄 데이터 spring에서 받아줄 데이터
+    let replyDTO = {
+        rno : "" ,
+        bno: "" ,
+        replyText : "",
+        writer : ""
+    }
+    //modifiy 버튼 눌렀을때
+    modifiy.on("click", function () {
+        location.href = "/board/update?bno=" + bno;
+    })
+
+
+
+    // 이벤트
+    // 등록버튼 클릭시
+    registerbtn.on("click", function () {
+        cbtn.hide()
+        closebtn.show()
+        savebtn.show()
+
+        replytitle.text("댓글 등록")
+        replytext.val("")   //먼저 내용을 지워준다.
+        replywriter.val("")
+
+    })
+
+    $(".addd").on("click", function () {
+        replylistajax(bno, page, listhtml1);
+    })
+
+    // 목록 클릭시
+    replylist.on("click", "li", function () {
+
+        console.log($(this).data("num"))
+        $(".modal").modal("show")
+        cbtn.hide()
+        closebtn.show()
+        modifybtn.show()
+        delbtn.show()
+        read($(this).data("num")); //rno를 넣어준다
+        rno = $(this).data("num")
+
+
+    })
+    // 저장 클릭시
+    savebtn.on("click", function (){
+        replyDTO.bno = bno;   //글번호
+        replyDTO.replyText = replytext.val();//댓글내용
+        replyDTO.writer = replywriter.val();//댓글작성자
+
+
+        console.log(replyDTO)
+
+        replysave(replyDTO);  //전송 RestReplyController로 전송
+        // update();
+        //모달창 닫기
+        //모달창 닫기
+        $(".modal").modal("hide")
+        page=1;
+        showList();
+    })
+
+    // 수정버튼 클릭시
+    modifybtn.on("click", function () {
+        // console.log($(".rnomodal").val())
+        replyDTO.rno = $(".rnomodal").val()
+        replyDTO.replyText = replytext.val()
+        replyDTO.writer = replywriter.val()
+        replyDTO.rno=rno
+
+        console.log(replyDTO)
+
+        update(replyDTO); //브라우저 클릭 눌렀을때 로딩되는 텀이 발생한다
+        // showList() //페이지 상에서 로딩하고 이후에 백에서 받아서 넘어옴. 더 오래걸림
+
+        $(".modal").modal(this)
+    })
+
+    // 삭제버튼 클릭시
+    delbtn.on("click", function () {
+        console.log("홍길동")
+        del(rno);
+        $(".modal").modal("hide")
+
+    })
+
+    showList();
+    //페이지의 페이지 버튼을 눌렀을때
+    $(".pagination").on("click", "a", function () {
+        // alert("홍길동")
+        // alert("현재 클릭한 페이지번호는"+$(this).text())
+        //해당 페이지를 넣어줘야한다.
+        page=$(this).text()
+        showList(); //파라미터가 없다면 위에 선언해준대ㅗㄹ page를 가져다 쓴다
+    })
+
+    // $(".페이지번호의 클래스").on("click", "li", function () {
+    //     //해당 페이지를 넣어줘야 한다.
+    //     //아직 페이지 번호를 button인지 a태그인지 모름.
+    //     //button은 value val(), a data-num?
+    //     page=$(this).val(); //내가 클릭한 버튼의 번호
+    //     showList(); //파라미터가 없다면 위에 선언해준대로 page를 가져다 쓴다
+    // })
+
+
+
+
+    // 목록 보여줄 함수
+    function showList(){
+        replylistajax(bno, page, listhtml);    //데이터를 가져오는 아이
+    }
+    function listhtml(result) {       //데이터(result)를 가져올때 사용할 calback함수
+
+        console.log(result)
+        let str = "";
+        let str1 = "";
+        for (let i = 0; i < result.dtoList.length; i++) {
+
+            //html에 그려주기
+            let rt = result.dtoList[i].replyText;
+            let rw = result.dtoList[i].writer;
+            let r  = result.dtoList[i].rno;
+
+
+            str += `<li data-num="${r}" class="list-group-item d-flex justify-content-between align-items-start">
+          <div class="ms-2 me-auto">
+            <div class="fw-bold">${rw}</div>
+            ${rt}
+          </div>
+          <span class="badge text-bg-primary rounded-pill">14</span>
+        </li>` ;
+
+        }
+        //페이징처리
+
+
+        if(result.prev){
+            str1 = `<li class="page-item disabled">
+      <a class="page-link">Previous</a>
+    </li>`
+        }
+
+        for (let i = result.start  ; i <= result.end; i++) {
+
+            if(i == result.page){
+
+                str1 += `<li class="page-item active">
+                    <a class="page-link" href="#">${i}</a>
+                </li>`
+            }else {
+                str1 += `<li class="page-item">
+                    <a class="page-link" href="#">${i}</a>
+                </li>`
+            }
+        }
+        if(result.next){
+            str1 += `<li class="page-item">
+      <a class="page-link">Next</a>
+    </li>`
+        }
+
+
+
+        replylist.html(str)
+        pagination.html(str1)
+
+
+    }
+    function listhtml1(result) {       //데이터(result)를 가져올때 사용할 calback함수
+
+        console.log(result)
+        let str = "";
+        for (let i = 0; i < result.dtoList.length; i++) {
+
+            console.log(result.dtoList[i])
+            console.log("-----------------------------")
+            //html에 그려주기
+            let rt = result.dtoList[i].replyText;
+            let rw = result.dtoList[i].writer;
+            let r  = result.dtoList[i].rno;
+
+
+            str += `<li class="list-group-item d-flex justify-content-between align-items-start">
+          <div class="ms-2 me-auto">
+            <div class="fw-bold">${rw}</div>
+            ${rt}
+          </div>
+          <span class="badge text-bg-primary rounded-pill">14</span>
+        </li>` ;
+
+        }
+        replylist.append(str)
+
+
+    }
+
+
+    // 함수
+    //댓글 등록
+    function replysave(replyDTO) {
+
+        console.log(replyDTO) //들어온값 로그
+
+        $.ajax({
+            url : "/reply/register",
+            data : replyDTO ,
+            type : "post",
+            success : function (result) {
+                alert(result)       //성공후  또는 실패 메시지
+                showList()
+            },
+            error : function (error) {
+                console.log(error)    //에러
+                console.log(error.status)
+
+                console.log(error.responseText)
+                if (error.status == 400){
+                    alert("400에러임")
+                }
+            }
+        })
+
+    }
+
+    //댓글 목록 : 현재보고 있는 글번호와 현재 댓글의 페이지를 같이 준다.
+    // 콜백함수를 줘서 받은 데이터를 html에 그려준다.
+    function replylistajax( bno, pageNum , calback) {
+
+        console.log("받은 bno" + bno)
+        console.log("받은 page" + pageNum)
+
+
+        $.ajax({
+
+            url : "/reply/list" ,
+            data : { bno : bno    , page : pageNum   } ,
+            success : function (data) {
+                calback(data)
+                page = data.page;
+                //page = data.page +1;
+
+            },
+            error : function (error) {
+
+            }
+
+        })
+
+
+
+
+
+
+    }
+
+    //댓글 읽기1개만
+    function read(rno) {
+
+        $.ajax({
+            url : "/reply/read/"+rno,
+            success : function (result) {
+                console.log(result)
+                replytext.val(result.replyText)
+                replywriter.val(result.writer)
+                $(".modal").append("<input type='hidden' class='rnomodal' value='"+result.rno+"'>")
+            },
+            error : function (error) {
+
+            }
+
+        })
+
+
+
+    }
+
+    //댓글 수정
+    function update(replyDTO) {
+
+        $.ajax({
+            url : "/reply/update",
+            data : replyDTO,
+            type: "post",
+            success : function (result) {
+                alert(result)
+                showList() //위에서 진행하면 로딩텀이 길어져서 밖에서 따로 만드는게 짧음
+            },
+            error : function (error) {
+
+            }
+        })
+    }
+
+    //댓글 삭제
+    function del(rno){
+        $.ajax({
+            url : "/reply/del",
+            data : {rno:rno},
+            type : "post",
+            success : function (result) {
+                alert(result)
+                showList()
+            },
+            error : function (error) {
+                
+            }
+        })
+    }
+
+
+
+
+
+
+</script>
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+</body>
+</html>

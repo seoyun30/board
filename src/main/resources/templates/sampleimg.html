@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<h1>홍길동</h1>
+
+    <img src="/images/a.png">
+    <img src="file:\\\C:upload/a.png">
+
+    <form action="/img" method="post" enctype="multipart/form-data">
+
+        글자 : <input name="str"><br>
+        파일업로드 : <input type="file" name="mul"><br>
+        <button>타입이 없다면 디폴트 서브밋</button>
+
+    </form>
+
+<script>
+
+    let fineD = $("input")
+    fineD.on("change", function () {
+        let reader = new FileReader()
+        console.log($(this))
+    })
+
+
+
+</script>
+
+
+</body>
+</html>

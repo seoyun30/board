@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <h1>글등록</h1>
+
+    <div class="container">
+        <form action="/board/register" method="post" th:object="${boardDTO}">
+            <div class="row">
+                <div class="col">
+                    <div class="row">
+
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="exampleFormControlInput1" class="form-label">제목</label>
+                                <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}" class="fieldError"></span>
+                                <input type="text" th:field="*{title}" class="form-control" id="exampleFormControlInput1" placeholder="제목을 입력하시오">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="exampleFormControlTextarea2" class="form-label">내용</label>
+                                <h1 th:if="${#fields.hasErrors('content')}" th:errors="*{content}" class="fieldError"></h1>
+                                <textarea th:field="*{content}" name="content" class="form-control" id="exampleFormControlTextarea2" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+
+                        <div class="col">
+                            <div class="mb-3">
+                                <label for="exampleFormControlInput3" class="form-label">작성자</label>
+                                <input type="text" th:field="*{writer}" name="writer" class="form-control" id="exampleFormControlInput3" placeholder="작성자를 작성하시오">
+                                <h1 th:if="${#fields.hasErrors('writer')}" th:errors="*{writer}" class="fieldError"></h1>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-dark">저장</button>
+                    <button type="button" class="btn btn-dark">목록</button>
+                </div>
+
+            </div>
+        </form>
+    </div>
+
+
+
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+</body>
+</html>

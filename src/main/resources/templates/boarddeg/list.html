@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en"  xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <style>
+        body{
+            width: 1080px;
+        }
+    </style>
+</head>
+<body>
+    <h1>목록</h1>
+
+    [[${pageRequestDTO}]]
+    <form class="formObj" action="/board/list" method="get" th:object="${pageRequestDTO}">
+        <select name="type" th:field="*{type}">
+            <option value="t">제목</option>
+            <option value="c">내용</option>
+            <option value="w">작성자</option>
+            <option value="tc">제목 + 내용</option>
+            <option value="tw">제목 + 작성자</option>
+            <option value="tcw">제목 + 내용 + 작성자</option>
+        </select>
+
+        <input name="keyword" th:field="*{keyword}">
+        <button type="submit">Search</button>
+    </form>
+
+
+    <div class="row">
+
+        <div class="col">
+            <table class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>글번호</th>
+                    <th>글제목</th>
+                    <th>작성자</th>
+                    <th>등록일자</th>
+                </tr>
+                </thead>
+                <tbody>
+
+                <th:block th:each="boardDTO: ${pageResponseDTO.getDtoList()}">
+                    <tr>
+                        <td th:text="${boardDTO.bno}"></td>
+                        <td>
+                            <a th:href="@{|/templates/boarddeg/read?bno=${boardDTO.bno + '&' + pageRequestDTO.getLink()}|}">
+                                [[${boardDTO.title}]]
+                            </a>
+                        </td>
+                        <td th:text="${boardDTO.writer}"></td>
+                        <td th:text="${boardDTO.regdate}"></td>
+
+                    </tr>
+                </th:block>
+
+                </tbody>
+
+            </table>
+
+            <th:block th:if="${pageResponseDTO.prev}">
+                <a class="pagingbtn" th:href="@{/templates/boarddeg/list(page=${pageResponseDTO.start - 1})}">이전</a>
+            </th:block>
+
+            <div th:with="a=${pageRequestDTO}">
+                <th:block th:each="i: ${#numbers.sequence(pageResponseDTO.start, pageResponseDTO.end)}">
+                    <a class="pagingbtn" th:href="@{|/templates/boarddeg/list|}">[[${i}]]</a>
+                </th:block>
+            </div>
+
+
+            <th:block th:if="${pageResponseDTO.next}">
+                <a class="pagingbtn" th:href="@{/templates/boarddeg/list(page=${pageResponseDTO.end + 1})}">다음</a>
+            </th:block>
+
+
+            <script th:inline="javascript">
+                let pageResponseDTO = [[${pageResponseDTO}]]
+                console.log(pageResponseDTO)
+
+                $(".pagingbtn").on("click", function (e) {
+                    e.preventDefault()  //기본기능을 멈춤
+                    //let num = e.target.innerText
+
+                    //내가 클릭한 타겟을 this
+                    let num = $(this).text()
+
+                    //let num3 = this.innerText
+                    //console.log( num3)
+                    let str = "";
+                    if(num == '다음'){
+                        str = `<input type="hidden" name="page" value="${pageResponseDTO.end +1}">`
+                    }else if(num == '이전'){
+                        str = `<input type="hidden" name="page" value="${pageResponseDTO.start -1}">`
+                    }else {
+                        str = `<input type="hidden" name="page" value="${num}">`
+                    }
+
+                    let formObj = $(".formObj")
+                    console.log(formObj)
+
+                    formObj.append(str)
+
+                    console.log("클릭함")
+                    formObj.submit()  //전송
+                })
+            </script>
+
+
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+</body>
+</html>
